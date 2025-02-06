@@ -4,12 +4,14 @@ services:
     image: postgres:17.2
     volumes:
       - ./postgres/data:/var/lib/postgresql/data/
+    env_file:
+      - ./envs/dev/django/.env
     environment:
-      POSTGRES_DB: blog_db
-      POSTGRES_USER: blog_user
-      POSTGRES_PASSWORD: blog_password
+      POSTGRES_PASSWORD: postgres
     expose:
       - "5432"
+    ports:
+      - "5432:5432"
     restart: always
   
 
@@ -22,9 +24,11 @@ services:
       - ./core:/usr/src/app
     working_dir: /usr/src/app
     # command: django-admin startproject core .
-    command: python manage.py runserver
-    environment:
-      - DEBUG=1
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"    
+    env_file:
+      - ./envs/dev/django/.env.sample
     restart: always
     depends_on:
       - db
