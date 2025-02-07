@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts',
-    # 'blog',
+    'blog',
     
 ]
 
@@ -132,13 +132,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
-
 MEDIA_URL = "/media/"
+
+STATIC_ROOT = BASE_DIR / "staticfiles" # in new rules in gunigorn an another platform, static root uses in anywhere 
 MEDIA_ROOT = BASE_DIR / "media"
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    BASE_DIR / "static", # we need somewhere for our static for test, and after collectstatic, these files move to staticfiles and media
 ]
 
 
