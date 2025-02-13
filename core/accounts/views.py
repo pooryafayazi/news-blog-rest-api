@@ -9,6 +9,8 @@ from .forms import CustomUserCreationForm
 from django.shortcuts import redirect
 from django.urls import reverse
 
+
+"""
 def login_view(request):
     if not request.user.is_authenticated:
         if request.method == 'POST':
@@ -30,6 +32,13 @@ def login_view(request):
         return render(request, 'accounts/login.html', context)
     else:
         return redirect(reverse('blog:post_list'))
+"""
+
+from django.shortcuts import render
+
+def login_view(request):
+    return render(request, 'registration/login.html')
+
 
 def logout_view(request):
     if request.user.is_authenticated:

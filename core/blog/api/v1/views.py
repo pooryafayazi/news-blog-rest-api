@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-# from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter ,OrderingFilter
 from rest_framework.permissions import (IsAdminUser, IsAuthenticated,IsAuthenticatedOrReadOnly,)
 from rest_framework import viewsets
@@ -9,6 +9,7 @@ from rest_framework.decorators import action
 from .serializers import PostSerializer, CategorySerializer,PostCommentSerializer
 from .paginations import CustomPagination
 from .permissions import IsOwnerOrReadOnly
+# from .filter import PostFilter
 from ...models import Post,Category,PostComment
 
 
@@ -18,7 +19,7 @@ class PostModelViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.filter(status=True)
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
-    # filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]
+    filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]
     # filterset_classes = PostFilter
     filterset_fields = ['author','category','status']
     search_fields = ['title','content']
@@ -113,6 +114,6 @@ class PostCommentModelViewSet(viewsets.ModelViewSet):
 
 
 class CategoryModelViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     serializer_class = CategorySerializer
     queryset = Category.objects.all()

@@ -126,3 +126,16 @@ class PasswordResetConfirmView(generics.UpdateAPIView):
         return Response({"detail": "Password has been reset successfully."}, status=status.HTTP_200_OK)
     
 
+
+class ProfileApiView(generics.RetrieveUpdateAPIView):
+    serializer_class = serializers.ProfileSerializer
+    queryset = Profile.objects.all()
+    
+    def get_object(self):
+        if self.request.user.is_anonymous:
+            return Response({'detail': 'Authentication credentials were not provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        queryset = self.get_queryset()
+        obj = get_object_or_404(queryset, user=self.request.user)
+        return obj
+

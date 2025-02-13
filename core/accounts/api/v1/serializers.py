@@ -50,8 +50,7 @@ class SignupSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
     password1 = serializers.CharField(write_only=True, label="تکرار رمز عبور")
     first_name = serializers.CharField(write_only=True)
-    last_name = serializers.CharField(write_only=True)    
-
+    last_name = serializers.CharField(write_only=True)
     
     class Meta:
         model = User
@@ -81,7 +80,7 @@ class SignupSerializer(serializers.Serializer):
         profile.save()
 
         code = random.randint(100000, 999999)
-        cache.set(user.email, code, timeout=300)
+        cache.set(user.email, code, timeout=600)
 
         send_mail(
             'کد تأیید ایمیل',
@@ -139,7 +138,7 @@ class PasswordResetRequestSerializer(serializers.Serializer):
     def create(self, validated_data):
         email = validated_data['email']
         code = random.randint(100000, 999999)
-        cache.set(email, code, timeout=180)
+        cache.set(email, code, timeout=600)
 
         send_mail(
             'Password Reset Code',
@@ -177,4 +176,14 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         user = User.objects.get(email=email)
         # user.set_password(new_password)
         user.set_password(self.validated_data['new_password'])
+        user.is_verified = True
         user.save()
+        
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    email = serializers.CharField(source = 'user.email',read_only=True)
+    class Meta:
+        model = Profile
+        fields = ['id', 'email', 'first_name', 'last_name', 'image', 'description']
+        read_only_fields = ['email']
