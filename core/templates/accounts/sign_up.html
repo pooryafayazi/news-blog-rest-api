@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Signup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        form {
+            max-width: 300px;
+            margin: auto;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+        }
+        button {
+            padding: 10px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Signup</h1>
+    <form id="signupForm">
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <input type="password" id="password1" placeholder="Confirm Password" required>
+        <input type="text" id="firstName" placeholder="First Name" required>
+        <input type="text" id="lastName" placeholder="Last Name" required>
+        <button type="submit">Signup</button>
+    </form>
+    <p id="signupMessage"></p>
+
+    <script>
+        const signupForm = document.getElementById('signupForm');
+        const signupMessage = document.getElementById('signupMessage');
+
+        // Check if user is already authenticated
+        if (localStorage.getItem('jwt')) {
+            window.location.href = '/all-posts.html'; // Redirect to all posts page
+        }
+
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const password1 = document.getElementById('password1').value;
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+
+            if (password1 !== password2) {
+                signupMessage.textContent = 'Passwords do not match.';
+                return;
+            }
+
+            const response = await fetch('/api/signup-api/', { // Adjust endpoint as needed
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password: password1, first_name: firstName, last_name: lastName })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                signupMessage.textContent = 'Signup successful! You can now log in.';
+            } else {
+                signupMessage.textContent = data.detail || 'Signup failed. Please try again.';
+            }
+        });
+    </script>
+</body>
+</html>

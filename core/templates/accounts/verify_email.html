@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تأیید ایمیل</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #timer {
+            font-weight: bold;
+            color: red;
+        }
+        #resendButton {
+            display: none; /* Initially hidden */
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>تأیید ایمیل</h1>
+    <form id="verificationForm">
+        <input type="text" id="email" placeholder="ایمیل شما" value="user@example.com" readonly>
+        <input type="text" id="verificationCode" placeholder="کد شش رقمی" required>
+        <button type="submit">تأیید</button>
+    </form>
+    <p id="message"></p>
+    <p id="timer">زمان باقی‌مانده: <span id="countdown">05:00</span></p>
+    <button id="resendButton" onclick="resendCode()">ارسال مجدد کد</button>
+
+    <script>
+        const verificationForm = document.getElementById('verificationForm');
+        const message = document.getElementById('message');
+
+        verificationForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const verificationCode = document.getElementById('verificationCode').value;
+
+            const response = await fetch('/api/verify-email/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, verification_code: verificationCode })
+            });
+
+            if (response.ok) {
+                window.location.href = '/all-posts.html'; // Redirect to all posts page
+            } else {
+                const data = await response.json();
+                message.textContent = data.detail || 'تأیید ناموفق. لطفاً دوباره امتحان کنید.';
+            }
+        });
+    </script>
+    <script>
+        let timeLeft = 300; // 5 minutes in seconds
+        const countdownElement = document.getElementById('countdown');
+        const resendButton = document.getElementById('resendButton');
+
+        const countdownTimer = setInterval(() => {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            countdownElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+            if (timeLeft <= 0) {
+                clearInterval(countdownTimer);
+                alert('زمان تأیید کد به پایان رسیده است.');
+                resendButton.style.display = 'block'; // Show resend button
+            }
+            timeLeft -= 1;
+        }, 1000);
+
+        function resendCode() {
+            // Here you can add your AJAX call to resend the verification code
+            alert('کد تأیید مجدداً ارسال شد.'); // Placeholder alert
+            // You may want to reset the timer or re-hide the button if needed
+        }
+    </script>
+</body>
+</html>

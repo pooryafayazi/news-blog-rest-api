@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fa">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.6.0/mdb.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.6.0/mdb.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لیست پست‌ها</title>
+   <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .post {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 10px 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .post img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        .post-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .post-snippet {
+            color: #555;
+        }
+
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>لیست پست‌ها</h1>
+    <div id="posts-container"></div>
+    <div class="pagination" id="pagination"></div>
+
+    <script>
+        const apiUrl = 'http://127.0.0.1:8000/blog/api/v1/posts/';
+
+        async function fetchPosts(url) {
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                displayPosts(data.results);
+                setupPagination(data.next, data.previous);
+            } catch (error) {
+                console.error('Error fetching posts:', error);
+            }
+        }
+
+        function displayPosts(posts) {
+            const postsContainer = document.getElementById('posts-container');
+            postsContainer.innerHTML = ''; // Clear previous posts
+            posts.forEach(post => {
+                const postDiv = document.createElement('div');
+                postDiv.className = 'post';
+                postDiv.innerHTML =
+                    <img src="${post.image}" alt="${post.title}">
+                        <div class="post-title">${post.title}</div>
+                        <div class="post-snippet">${post.snippet}</div>
+                        <div><strong>تاریخ انتشار:</strong> ${new Date(post.published_date).toLocaleString()}</div>
+                        <div><strong>تعداد بازدید:</strong> ${post.counted_views}</div>
+                        ;
+                        postsContainer.appendChild(postDiv);
+});
+}
+
+                        function setupPagination(nextUrl, previousUrl) {
+ const paginationDiv = document.getElementById('pagination');
+                        paginationDiv.innerHTML = ''; // Clear previous pagination
+                        if (previousUrl) {
+const prevButton = document.createElement('button');
+                        prevButton.innerText = 'قبلی';
+ prevButton.onclick = () => fetchPosts(previousUrl);
+                        paginationDiv.appendChild(prevButton);
+}
+                        if (nextUrl) {
+                        const nextButton = document.createElement('button');
+                        nextButton.innerText = 'بعدی';
+ nextButton.onclick = () => fetchPosts(nextUrl);
+                        paginationDiv.appendChild(nextButton);
+ }
+}
+
+                        // Fetch initial posts
+                        fetchPosts(apiUrl);
+    </script>
+
+</body>
+
+</html>

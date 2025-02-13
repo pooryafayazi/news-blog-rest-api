@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posts in Category</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .post {
+            border: 1px solid #ccc;
+            margin: 10px 0;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Posts in Category: <span id="categoryName"></span></h1>
+    <section id="postsContainer"></section>
+
+    <script>
+        const postsContainer = document.getElementById('postsContainer');
+        const categoryName = document.getElementById('categoryName');
+        const categoryId = new URLSearchParams(window.location.search).get('categoryId');
+
+        async function fetchPostsByCategory() {
+            const response = await fetch(`/api/posts/?category=${categoryId}`);
+            const data = await response.json();
+            categoryName.textContent = data.categoryName; // Assuming the API returns category name
+            renderPosts(data.results);
+        }
+
+        function renderPosts(posts) {
+            postsContainer.innerHTML = '';
+            posts.forEach(post => {
+                const postDiv = document.createElement('div');
+                postDiv.classList.add('post');
+                postDiv.innerHTML = `
+                    <h2><a href="${post.absolute_api_url}">${post.title}</a></h2>
+                    <p>${post.snippet}</p>
+                `;
+                postsContainer.appendChild(postDiv);
+            });
+        }
+
+        fetchPostsByCategory(); // Initial fetch
+    </script>
+</body>
+</html>

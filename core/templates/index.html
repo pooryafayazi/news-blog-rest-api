@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch Posts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .post {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>آخرین پست‌ها</h1>
+<div id="latest-posts"></div>
+
+<h1>پست‌های پر بازدید</h1>
+<div id="most-views"></div>
+
+<h1>پست‌های نویسنده خاص</h1>
+<div id="author-posts"></div>
+
+<h1>لیست کل پست‌ها</h1>
+<div id="all-posts"></div>
+
+<script>
+
+    const apiUrl = 'http://localhost:8000/api/v1/posts/'; 
+
+
+    async function fetchLatestPosts() {
+        const response = await fetch(${apiUrl}latest_posts/);
+        const data = await response.json();
+        const latestPostsDiv = document.getElementById('latest-posts');
+        latestPostsDiv.innerHTML = '';
+        data.forEach(post => {
+            latestPostsDiv.innerHTML += <div class="post">
+                <h2>${post.title}</h2>
+                <p>${post.content}</p>
+                <p><strong>تاریخ انتشار:</strong> ${post.published_date}</p>
+            </div>;
+        });
+    }
+
+    async function fetchMostViews() {
+        const response = await fetch(${apiUrl}most_views/);
+        const data = await response.json();
+        const mostViewsDiv = document.getElementById('most-views');
+        mostViewsDiv.innerHTML = '';
+        data.forEach(post => {
+            mostViewsDiv.innerHTML += <div class="post">
+                <h2>${post.title}</h2>
+                <p>${post.content}</p>
+                <p><strong>تعداد بازدید:</strong> ${post.counted_views}</p>
+            </div>;
+        });
+    }
+
+    // Fetch (pk=1)
+    async function fetchAuthorPosts(authorId) {
+        const response = await fetch(${apiUrl}${authorId}/posts_author/);
+        const data = await response.json();
+        const authorPostsDiv = document.getElementById('author-posts');
+        authorPostsDiv.innerHTML = '';
+        data.forEach(post => {
+            authorPostsDiv.innerHTML += <div class="post">
+                <h2>${post.title}</h2>
+                <p>${post.content}</p>
+            </div>;
+        });
+    }
+
+
+    async function fetchAllPosts() {
+        const response = await fetch(${apiUrl}all_posts/);
+        const data = await response.json();
+        const allPostsDiv = document.getElementById('all-posts');
+        allPostsDiv.innerHTML = '';
+        data.forEach(post => {
+            allPostsDiv.innerHTML += <div class="post">
+                <h2>${post.title}</h2>
+                <p>${post.content}</p>
+                <p><strong>تاریخ انتشار:</strong> ${post.published_date}</p>
+            </div>;
+        });
+    }
+
+
+    fetchLatestPosts();
+    fetchMostViews();
+    fetchAuthorPosts(1); // author ID=1 
+    fetchAllPosts();
+
+</script>
+
+</body>
+</html>

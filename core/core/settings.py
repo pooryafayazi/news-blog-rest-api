@@ -38,7 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'drf_yasg',
     'rest_framework',
+    'rest_framework_simplejwt',
     'accounts',
     'blog',
     
@@ -151,11 +153,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # STMP config form email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
-EMAIL_PORT = config('EMAIL_PORT',cast=int , default=587)
+EMAIL_PORT = config('EMAIL_PORT',cast=int , default=587)  #  465  SSL
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool, default='True')
-EMAIL_USE_SSL = config('EMAIL_USE_SSL', cast=bool, default='True')
-EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+EMAIL_USE_SSL = config('EMAIL_USE_SSL', cast=bool, default='False')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='webit.test.2024@gmail.com')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='gpst abpb kgmy yerx')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='EMAIL_HOST_USER')
 
 
@@ -177,3 +179,10 @@ if SHOW_DEBUGGER_TOOLBAR:
     
 # Custom User model
 AUTH_USER_MODEL = 'accounts.User'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}

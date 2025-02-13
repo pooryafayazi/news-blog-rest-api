@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
+# from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter ,OrderingFilter
 from rest_framework.permissions import (IsAdminUser, IsAuthenticated,IsAuthenticatedOrReadOnly,)
 from rest_framework import viewsets
@@ -18,7 +18,7 @@ class PostModelViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.filter(status=True)
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
-    filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]
+    # filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]
     # filterset_classes = PostFilter
     filterset_fields = ['author','category','status']
     search_fields = ['title','content']
@@ -49,7 +49,7 @@ class PostModelViewSet(viewsets.ModelViewSet):
     """
     
     @action(detail=True, methods=['get'])
-    def most_views(self, request, pk=None):
+    def latest_posts(self, request, pk=None):
         most_views = self.queryset.order_by('-counted_views')[:2]
         serializer = self.serializer_class(most_views, many=True, context={'request':request})
         return Response(serializer.data)
@@ -73,7 +73,11 @@ class PostModelViewSet(viewsets.ModelViewSet):
         serializer = self.serializer_class(posts_topic, many=True, context={'request':request})
         return Response(serializer.data)
     """
-    
+
+from django.shortcuts import render
+
+def posts_list(request):
+    return render(request, 'blog/posts.html')
    
 class PostCommentModelViewSet(viewsets.ModelViewSet):
     queryset = PostComment.objects.all()

@@ -51,7 +51,7 @@ class Profile(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     image = models.ImageField(blank=True , null=True)
-    description = models.TextField()
+    description = models.TextField(blank=True , null=True)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     
@@ -63,3 +63,8 @@ class Profile(models.Model):
 def save_profile(sender, instance,created, **kwargs):
     if created:
         Profile.objects.create(user=instance, pk=instance.pk)
+    else:
+        profile = Profile.objects.get(user=instance, pk=instance.pk)
+        profile.first_name = instance.first_name
+        profile.last_name = instance.last_name
+        profile.save()

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .comment {
+            border-top: 1px solid #ccc;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="postTitle"></h1>
+    <p id="postContent"></p>
+    <h3>Comments</h3>
+    <section id="commentsContainer"></section>
+
+    <script>
+        const postTitle = document.getElementById('postTitle');
+        const postContent = document.getElementById('postContent');
+        const commentsContainer = document.getElementById('commentsContainer');
+        const postId = new URLSearchParams(window.location.search).get('postId');
+
+        async function fetchPostDetails() {
+            const response = await fetch(`/api/posts/${postId}/`);
+            const postData = await response.json();
+            postTitle.textContent = postData.title;
+            postContent.textContent = postData.content;
+            renderComments(postData.comments); // Assuming postData contains comments
+        }
+
+        function renderComments(comments) {
+            commentsContainer.innerHTML = '';
+            comments.forEach(comment => {
+                const commentDiv = document.createElement('div');
+                commentDiv.classList.add('comment');
+                commentDiv.innerHTML = `
+                    <strong>${comment.user}</strong>: ${comment.message}
+                `;
+                commentsContainer.appendChild(commentDiv);
+            });
+        }
+
+        fetchPostDetails(); // Initial fetch
+    </script>
+</body>
+</html>

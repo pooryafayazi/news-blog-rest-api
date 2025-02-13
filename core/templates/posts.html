@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Posts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 {
+            margin: 0;
+        }
+        .post {
+            border: 1px solid #ccc;
+            margin: 10px 0;
+            padding: 10px;
+        }
+        .pagination {
+            margin-top: 20px;
+        }
+        .pagination a {
+            margin: 0 5px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Blog</h1>
+        <div>
+            <input type="text" id="search" placeholder="Search posts...">
+            <button id="loginBtn">Login</button>
+            <span id="userEmail" class="hidden"></span>
+            <button id="logoutBtn" class="hidden">Logout</button>
+        </div>
+    </header>
+    
+    <section id="postsContainer"></section>
+    
+    <div class="pagination" id="pagination"></div>
+
+    <script>
+        const postsContainer = document.getElementById('postsContainer');
+        const pagination = document.getElementById('pagination');
+        const searchInput = document.getElementById('search');
+        const userEmail = document.getElementById('userEmail');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        let currentUser = null; // Store current user info
+        let currentPage = 1;
+        let token = localStorage.getItem('jwt'); // JWT token from local storage
+
+        async function fetchPosts(page = 1, search = '') {
+            const response = await fetch(`/api/posts/?page=${page}&search=${search}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+            renderPosts(data.results);
+            setupPagination(data);
+            console.log(data); // Show API response in console
+        }
+
+        function renderPosts(posts) {
+            postsContainer.innerHTML = '';
+            posts.forEach(post => {
+                const postDiv = document.createElement('div');
+                postDiv.classList.add('post');
+                postDiv.innerHTML = `
+                    <h2><a href="${post.absolute_api_url}">${post.title}</a></h2>
+                    <p>${post.snippet}</p>
+                    <p>Author: <a href="#" onclick="fetchPostsByAuthor(${post.author})">${post.name}</a></p>
+                    <p>Category: <a href="#" onclick="fetchPostsByCategory(${post.category.id})">${post.category.name}</a></p>
+                    <p>Views: ${post.counted_views}</p>
+                    ${currentUser && currentUser.id === post.author ? `
+                        <button onclick="editPost(${post.id})">Edit</button>
+                        <button onclick="deletePost(${post.id})">Delete</button>
+                    ` : ''}
+                `;
+                postsContainer.appendChild(postDiv);
+            });
+        }
+
+        function setupPagination(data) {
+            pagination.innerHTML = '';
+            for (let i = 1; i <= data.total_pages; i++) {
+                const pageLink = document.createElement('a');
+                pageLink.href = '#';
+                pageLink.textContent = i;
+                pageLink.onclick = () => {
+                    currentPage = i;
+                    fetchPosts(currentPage, searchInput.value);
+                };
+                pagination.appendChild(pageLink);
+            }
+        }
+
+        function fetchPostsByAuthor(authorId) {
+            fetchPosts(1, `author=${authorId}`);
+        }
+
+        function fetchPostsByCategory(categoryId) {
+            fetchPosts(1, `category=${categoryId}`);
+        }
+
+        async function editPost(postId) {
+            // Implement edit functionality
+            alert(`Edit post ${postId}`);
+        }
+
+        async function deletePost(postId) {
+            const response = await fetch(`/api/posts/${postId}/`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (response.ok) {
+                fetchPosts(currentPage, searchInput.value);
+            } else {
+                alert('Failed to delete post.');
+            }
+        }
+
+        async function login(username, password) {
+            const response = await fetch('/api/login-api/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                token = data.access; // Store access token
+                localStorage.setItem('jwt', token);
+                currentUser = data.user; // Store user info
+                userEmail.textContent = currentUser.email;
+                userEmail.classList.remove('hidden');
+                loginBtn.classList.add('hidden');
+                logoutBtn.classList.remove('hidden');
+                fetchPosts(); // Fetch posts after login
+            } else {
+                alert('Login failed: ' + data.detail);
+            }
+        }
+
+        async function logout() {
+            token = null;
+            localStorage.removeItem('jwt');
+            currentUser = null;
+            userEmail.classList.add('hidden');
+            loginBtn.classList.remove('hidden');
+            logoutBtn.classList.add('hidden');
+            fetchPosts(); // Fetch posts after logout
+        }
+
+        searchInput.addEventListener('input', () => {
+            fetchPosts(1, searchInput.value);
+        });
+
+        loginBtn.addEventListener('click', () => {
+            const username = prompt('Enter your username:');
+            const password = prompt('Enter your password:');
+            if (username && password) {
+                login(username, password);
+            }
+        });
+
+        logoutBtn.addEventListener('click', logout);
+
+        // Check if user is logged in on initial load
+        if (token) {
+            // Optionally, you can fetch user info if needed
+            fetchPosts(); // Fetch posts if authenticated
+        } else {
+            fetchPosts(); // Fetch posts for public view
+        }
+    </script>
+</body>
+</html>

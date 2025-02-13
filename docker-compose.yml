@@ -1,4 +1,13 @@
 services:
+  redis:
+    container_name: redis-news
+    image: redis:7.2.4
+    restart: always
+    ports:
+      - 6379:6379    
+    volumes:
+      - redis_data:/data
+    command: redis-server --save 60 1 --loglevel warning
   db:
     container_name: db
     image: postgres:17.2
@@ -32,9 +41,11 @@ services:
     restart: always
     depends_on:
       - db
+      - redis
 
 volumes:
   postgres_data:
+  redis_data:
 
 
 
