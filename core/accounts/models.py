@@ -63,8 +63,10 @@ class Profile(models.Model):
 def save_profile(sender, instance,created, **kwargs):
     if created:
         Profile.objects.create(user=instance, pk=instance.pk)
+    """
     else:
         profile = Profile.objects.get(user=instance, pk=instance.pk)
         profile.first_name = instance.first_name
         profile.last_name = instance.last_name
         profile.save()
+    """

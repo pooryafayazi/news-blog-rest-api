@@ -74,10 +74,14 @@ class PostModelViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     """
 
+
+"""
 from django.shortcuts import render
 
 def posts_list(request):
     return render(request, 'blog/posts.html')
+"""
+
    
 class PostCommentModelViewSet(viewsets.ModelViewSet):
     queryset = PostComment.objects.all()

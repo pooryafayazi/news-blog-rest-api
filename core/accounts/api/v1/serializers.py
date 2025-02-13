@@ -93,7 +93,30 @@ class SignupSerializer(serializers.Serializer):
 
         return user
     
-    
+class VerifiedSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    code = serializers.IntegerField()
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+        code = attrs.get('code')
+
+        # Check if the user exists
+        if not User.objects.filter(email=email).exists():
+            raise serializers.ValidationError("This email is not registered.")
+
+        # Check if the code matches the cached code
+        cached_code = cache.get(email)
+        if cached_code != code:
+            raise serializers.ValidationError("Invalid or expired verification code.")
+        
+        return attrs
+
+    def save(self):
+        email = self.validated_data['email']
+        user = User.objects.get(email=email)
+        user.is_verified = True
+        user.save()   
 
 class EmailVerificationSerializer(serializers.Serializer):
     email = serializers.EmailField()

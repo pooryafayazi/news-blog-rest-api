@@ -30,10 +30,10 @@ class Post(models.Model):
         return f'{self.title} - {self.id}'
 
     def get_snippet(self):
-        return self.content[:10]+'...'
+        return self.content[:10]+'...' 
     
     def get_absolute_url(self):
-        return reverse('blog:post-detail', kwargs={'post_id':self.id})
+        return reverse('blog:api-v1:post-detail', kwargs={'post_id':self.id})
     
     def get_relative_api_url(self):
         return reverse('blog:api-v1:post-detail', kwargs={'pk':self.id})

@@ -21,21 +21,8 @@ from django.core.mail import send_mail
 # import datetime
 # import pytz
 
-from .serializers import (
-    # RegistrationSerializer,
-    #CustomAuthTokenSerializer,
-    CustomTokenObtainPairSerializer,
-    # ChangePasswordSerializer,
-    # ProfileSerializer,
-    # ActivationResendSerializer,
-    # ResetPasswordSerializer,
-    # ResetPasswordConfirmSerializer,
-    LoginSerializer,
-    PasswordResetRequestSerializer,
-    PasswordResetConfirmSerializer,
-    EmailVerificationSerializer,
-    SignupSerializer,
-)
+from . import serializers
+    
 # from ..utils import EmailThread
 from ...models import Profile
 
@@ -53,13 +40,14 @@ from .serializers import LoginSerializer
 
 """create JWT tokens for user"""
 class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
+    serializer_class = serializers.CustomTokenObtainPairSerializer
     
     
     
-class LoginApiView(generics.GenericAPIView, TemplateView):
-    serializer_class = LoginSerializer
-    template_name = 'accounts/login-api.html'
+# class LoginApiView(generics.GenericAPIView, TemplateView):
+class LoginApiView(generics.GenericAPIView):
+    serializer_class = serializers.LoginSerializer
+    # template_name = 'accounts/login-api.html'
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -77,10 +65,10 @@ class LoginApiView(generics.GenericAPIView, TemplateView):
     
     
 class SignupView(generics.CreateAPIView):
-    serializer_class = SignupSerializer
+    serializer_class = serializers.SignupSerializer
 
 class EmailVerificationRequestView(generics.CreateAPIView):
-    serializer_class = EmailVerificationSerializer
+    serializer_class = serializers.EmailVerificationSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -103,10 +91,21 @@ class EmailVerificationRequestView(generics.CreateAPIView):
 
         return Response({"detail": "Verification code sent."}, status=status.HTTP_200_OK)
     
+class VerifiedApiView(generics.GenericAPIView):
+    serializer_class = serializers.VerifiedSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()  # This will update the user's verification status
+
+        return Response({"detail": "Account verified successfully."}, status=status.HTTP_200_OK)
     
-class PasswordResetRequestView(generics.CreateAPIView, TemplateView):    
-    serializer_class = PasswordResetRequestSerializer
-    template_name = 'accounts/password_reset_request.html'
+    
+# class PasswordResetRequestView(generics.CreateAPIView, TemplateView):
+class PasswordResetRequestView(generics.CreateAPIView, TemplateView):
+    serializer_class = serializers.PasswordResetRequestSerializer
+    # template_name = 'accounts/password_reset_request.html'
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -115,9 +114,10 @@ class PasswordResetRequestView(generics.CreateAPIView, TemplateView):
         return Response({"detail": "Password reset code sent."}, status=status.HTTP_200_OK)
     
 
-class PasswordResetConfirmView(generics.UpdateAPIView, TemplateView):
-    serializer_class = PasswordResetConfirmSerializer
-    template_name = 'accounts/password_reset_confirmation.html'
+# class PasswordResetConfirmView(generics.UpdateAPIView, TemplateView):
+class PasswordResetConfirmView(generics.UpdateAPIView):
+    serializer_class = serializers.PasswordResetConfirmSerializer
+    # template_name = 'accounts/password_reset_confirmation.html'
 
     def update(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
