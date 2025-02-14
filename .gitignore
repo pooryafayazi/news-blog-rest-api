@@ -172,3 +172,5 @@ cython_debug/
 
 # ignore database files
 /postgres/data/*
+
+output*.json

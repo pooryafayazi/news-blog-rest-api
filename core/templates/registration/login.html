@@ -9,41 +9,39 @@
 <body>
     <h2>ورود به حساب کاربری</h2>
     <form id="loginForm">
-        <label for="email">ایمیل:</label>
-        <input type="text" id="email" name="email" required><br><br>
-        <label for="password">رمز عبور:</label>
-        <input type="password" id="password" name="password" required><br><br>
+        <label for="email">ایمیل:</label><input type="text" id="email" name="email" required><br><br>
+        <label for="password">رمز عبور:</label><input type="password" id="password" name="password" required><br><br>
         <button type="submit">ورود</button>
     </form>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            fetch('accounts/api/v1/login/', {
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // جلوگیری از ارسال پیش‌فرض فرم
+        
+            const email = this.email.value; // دریافت ایمیل
+            const password = this.password.value; // دریافت پسورد
+        
+            await loginUser(email, password); // فراخوانی تابع ورود
+        });
+        
+        async function loginUser(email, password) {
+            const response = await fetch('http://127.0.0.1:8000/accounts/api/v1/login/', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ email, password })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.access) {
-                    // توکن را ذخیره کنید یا هر کاری که می‌خواهید انجام دهید
-                    console.log('Access Token:', data.access);
-                    alert('ورود موفقیت‌آمیز بود!');
-                } else {
-                    alert('نام کاربری یا رمز عبور نادرست است.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
             });
-        });
-    </script>
+        
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem('access_token', data.access);
+                window.location.href = 'http://127.0.0.1:8000/blog/api/v1/post/';
+            } else {
+                const errorData = await response.json();
+                console.error('Login failed:', errorData.errors);
+            }
+        }
+        </script>
 </body>
 </html>

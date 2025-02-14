@@ -1,0 +1,36 @@
+<form id="login-form">
+    {% csrf_token %}
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <button type="submit">Login</button>
+</form>
+
+<script>
+document.getElementById('login-form').addEventListener('submit', async function(event) {
+    event.preventDefault(); // جلوگیری از ارسال پیش‌فرض فرم
+
+    const email = this.email.value; // دریافت ایمیل
+    const password = this.password.value; // دریافت پسورد
+
+    await loginUser(email, password); // فراخوانی تابع ورود
+});
+
+async function loginUser(email, password) {
+    const response = await fetch('http://127.0.0.1:8000/accounts/api/v1/login/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+    });
+
+    if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('access_token', data.access);
+        window.location.href = 'http://127.0.0.1:8000/blog/api/v1/post/';
+    } else {
+        const errorData = await response.json();
+        console.error('Login failed:', errorData.errors);
+    }
+}
+</script>

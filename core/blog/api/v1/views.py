@@ -49,11 +49,15 @@ class PostModelViewSet(viewsets.ModelViewSet):
             return Response({'detail': 'Post not found.'}, status=404)
     """
     
+    
+    """
     @action(detail=True, methods=['get'])
     def latest_posts(self, request, pk=None):
         most_views = self.queryset.order_by('-counted_views')[:2]
         serializer = self.serializer_class(most_views, many=True, context={'request':request})
         return Response(serializer.data)
+    """
+    
     
     @action(detail=True, methods=['get'])
     def posts_author(self, request, pk=None):
